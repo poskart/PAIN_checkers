@@ -3,7 +3,10 @@ import QtQuick.Window 2.2
 
 Window {
     visible: true
-    width: 640
-    height: 480
+    width: 800
+    height: 800
     title: qsTr("Hello World")
+    GameBoard{
+        id: gameBoard
+    }
 }
