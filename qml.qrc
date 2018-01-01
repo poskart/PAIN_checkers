@@ -2,5 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>GameBoard.qml</file>
+        <file>Piece.qml</file>
+        <file>Tile.qml</file>
     </qresource>
 </RCC>

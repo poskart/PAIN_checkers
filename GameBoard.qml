@@ -1,7 +1,7 @@
 import QtQuick 2.7
 
 Item {
-    id: root
+    id: gameBoard
     width: 800
     height: width
 
@@ -11,15 +11,34 @@ Item {
         columns: 8
         Repeater {
             model: 64
-            Rectangle {
-                property int row: (index / 8)
-                property int col: (index % 8)
-                width: 100
-                height: width
-                color: (row + col) % 2 ? "black" : "white"
-                Text{
-                    anchors.centerIn: parent
-                    text: row+"x"+col
+            Tile{
+                id: tile
+                row: index / 8
+                col: index % 8
+
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        console.log("Nacisnieto tile")
+                    }
+                }
+
+                Component.onCompleted: {
+                    if(row % 2 == col % 2)
+                    {
+                        if(tile.row <= 2){
+                            var component = Qt.createComponent("Piece.qml");
+                            tile.piece = component.createObject(tile);
+                            tile.piece.pieceColor = "white"
+                            tile.piece.anchors.centerIn = tile
+                        }
+                        else if(tile.row >= 5){
+                            var component = Qt.createComponent("Piece.qml");
+                            tile.piece = component.createObject(tile);
+                            tile.piece.pieceColor = "red"
+                            tile.piece.anchors.centerIn = tile
+                        }
+                    }
                 }
             }
         }
