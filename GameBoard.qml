@@ -10,6 +10,7 @@ Item {
     property Tile clickedTileWithPiece;
     property int whiteDirection: 1
     property int blackDirection: -1
+    property var lightenedTiles
 
     states: [
         State {
@@ -32,6 +33,90 @@ Item {
         clickedTileWithPiece = null
     }
 
+    function getPossibleCaptures(srcTile, srcPiece){
+        var validTiles = new Array()
+
+        if(!crossesTheBoard(srcTile, Qt.point(2, 2*srcPiece.direction))){
+            var nextTile = getNextTile(srcTile, Qt.point(2, 2*srcPiece.direction))
+            checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+        }
+        if(!crossesTheBoard(srcTile, Qt.point(-2, 2*srcPiece.direction))){
+            var nextTile = getNextTile(srcTile, Qt.point(-2, 2*srcPiece.direction))
+            checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+        }
+        if(srcPiece.isKing){
+            if(!crossesTheBoard(srcTile, Qt.point(2, -2*srcPiece.direction))){
+                var nextTile = getNextTile(srcTile, Qt.point(2, -2*srcPiece.direction))
+                checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+            }
+            if(!crossesTheBoard(srcTile, Qt.point(-2, -2*srcPiece.direction))){
+                var nextTile = getNextTile(srcTile, Qt.point(-2, -2*srcPiece.direction))
+                checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+            }
+        }
+
+        return validTiles
+    }
+
+    function checkPossibleCaptures(srcTile, currentTile, prevTile, srcPiece, validTiles){
+        if(srcTile == currentTile || currentTile.piece != null)
+            return
+        if(capturesEnemy(prevTile, currentTile, srcPiece)){
+            if(!crossesTheBoard(currentTile, Qt.point(2, 2*srcPiece.direction))){
+                var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                if(nextTile != prevTile)
+                    checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+            }
+            if(!crossesTheBoard(currentTile, Qt.point(-2, 2*srcPiece.direction))){
+                var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                if(nextTile != prevTile)
+                    checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+            }
+            if(srcPiece.isKing){
+                if(!crossesTheBoard(currentTile, Qt.point(2, -2*srcPiece.direction))){
+                    var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                    if(nextTile != prevTile)
+                        checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+                }
+                if(!crossesTheBoard(currentTile, Qt.point(-2, -2*srcPiece.direction))){
+                    var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                    if(nextTile != prevTile)
+                        checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+                }
+            }
+
+            validTiles.push(currentTile)
+        }
+    }
+
+    function getNextTile(srcTile, moveOffset){
+        var newColumn = srcTile.col + moveOffset.x
+        var newRow = srcTile.row + moveOffset.y
+        var index = newRow*grid.columns+newColumn
+        var tileBetween = tilesRepeater.itemAt(index)
+        return tileBetween
+    }
+
+    function crossesTheBoard(srcTile, moveOffset){
+        if(srcTile.row + moveOffset.y >= grid.rows ||
+                srcTile.row + moveOffset.y < 0 ||
+                srcTile.col + moveOffset.x >= grid.columns ||
+                srcTile.col + moveOffset.x < 0)
+            return true
+        return false
+    }
+
+    function capturesEnemy(srcTile, targetTile, srcPiece){
+        var newColumn = (srcTile.col + targetTile.col)/2
+        var newRow = (srcTile.row + targetTile.row)/2
+        var index = newRow*grid.columns+newColumn
+        var tileBetween = tilesRepeater.itemAt(index)
+        if(tileBetween.piece != null && tileBetween.piece.team != srcPiece.team)
+            return true
+        return false
+    }
+
+
     function validPieceTurn(piece){
         if(state == "whiteTurn" && piece.team === "white" ||
                 state == "blackTurn" && piece.team === "black")
@@ -44,10 +129,6 @@ Item {
             state = "blackTurn"
         else
             state = "whiteTurn"
-    }
-
-    function canCaptureOpponent(srcTile, targetTile, thisTeam){
-        if(true);
     }
 
     function goodDirectionChoosen(piece, targetTile){
@@ -68,6 +149,7 @@ Item {
         rows: 8
         columns: 8
         Repeater {
+            id: tilesRepeater
             model: 64
             Tile{
                 id: tile
@@ -79,11 +161,23 @@ Item {
                     onClicked: {
                         if(clickedPiece != null)
                             clickedPiece.darkenPiece()
+                        if(lightenedTiles != null){
+                            for(var i = 0; i < lightenedTiles.length; ++i){
+                                lightenedTiles[i].darkenPiece()
+                            }
+                            lightenedTiles = null
+                        }
+
                         if(tile.piece != null){
                             if(validPieceTurn(tile.piece)){
                                 clickedTileWithPiece = tile
                                 clickedPiece = tile.piece
                                 tile.piece.lightenPiece()
+                                lightenedTiles = getPossibleCaptures(tile, clickedPiece)
+                                for(var i = 0; i < lightenedTiles.length; ++i){
+                                    lightenedTiles[i].lightenPiece()
+                                }
+
                                 console.log("Clicked on piece")
                             }
                         }
@@ -104,6 +198,7 @@ Item {
                             tile.piece = component.createObject(tile);
                             tile.piece.pieceColor = "#DDDD99"
                             tile.piece.team = "white"
+                            tile.piece.direction = 1
                             tile.piece.anchors.centerIn = tile
                         }
                         else if(tile.row >= 5){
@@ -111,6 +206,7 @@ Item {
                             tile.piece = component.createObject(tile);
                             tile.piece.pieceColor = "red"
                             tile.piece.team = "black"
+                            tile.piece.direction = -1
                             tile.piece.anchors.centerIn = tile
                         }
                     }

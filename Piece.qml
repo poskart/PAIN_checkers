@@ -4,6 +4,9 @@ Rectangle {
     property color transitionColor: "red"
     property color pieceColor: "red"
     property string team;
+    property bool isKing: false
+    property int direction
+
     id : piece
     width: 80
     height: width
