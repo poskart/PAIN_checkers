@@ -33,59 +33,104 @@ Item {
         clickedTileWithPiece = null
     }
 
-    function getPossibleCaptures(srcTile, srcPiece){
+    function getPossibleCaptures(srcTile, srcPiece, clickedDestTile){
         var validTiles = new Array()
 
         if(!crossesTheBoard(srcTile, Qt.point(2, 2*srcPiece.direction))){
             var nextTile = getNextTile(srcTile, Qt.point(2, 2*srcPiece.direction))
-            checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+            if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+                srcTile.directionToCapture = Qt.point(2, 2*srcPiece.direction)
+                return true
+            }
+            else
+                return false
         }
         if(!crossesTheBoard(srcTile, Qt.point(-2, 2*srcPiece.direction))){
             var nextTile = getNextTile(srcTile, Qt.point(-2, 2*srcPiece.direction))
-            checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+            if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+                srcTile.directionToCapture = Qt.point(-2, 2*srcPiece.direction)
+                return true
+            }
+            else
+                return false
         }
         if(srcPiece.isKing){
             if(!crossesTheBoard(srcTile, Qt.point(2, -2*srcPiece.direction))){
                 var nextTile = getNextTile(srcTile, Qt.point(2, -2*srcPiece.direction))
-                checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+                if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+                    srcTile.directionToCapture = Qt.point(2, -2*srcPiece.direction)
+                    return true
+                }
+                else
+                    return false
             }
             if(!crossesTheBoard(srcTile, Qt.point(-2, -2*srcPiece.direction))){
                 var nextTile = getNextTile(srcTile, Qt.point(-2, -2*srcPiece.direction))
-                checkPossibleCaptures(srcTile, nextTile, srcTile, srcPiece, validTiles)
+                if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+                    srcTile.directionToCapture = Qt.point(-2, -2*srcPiece.direction)
+                    return true
+                }
+                else
+                    return false
             }
         }
 
         return validTiles
     }
 
-    function checkPossibleCaptures(srcTile, currentTile, prevTile, srcPiece, validTiles){
+    function checkPossibleCaptures(srcTile, clickedDestTile, currentTile, prevTile, srcPiece, validTiles){
         if(srcTile == currentTile || currentTile.piece != null)
-            return
+            return false;
+        if(currentTile == clickedDestTile)
+            return true;
         if(capturesEnemy(prevTile, currentTile, srcPiece)){
+            validTiles.push(currentTile)
             if(!crossesTheBoard(currentTile, Qt.point(2, 2*srcPiece.direction))){
                 var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
-                if(nextTile != prevTile)
-                    checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+                if(nextTile != prevTile){
+                    if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                        currentTile.directionToCapture = Qt.point(2, 2*srcPiece.direction)
+                        return true
+                    }
+                    else
+                        return false
+                }
             }
             if(!crossesTheBoard(currentTile, Qt.point(-2, 2*srcPiece.direction))){
-                var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
-                if(nextTile != prevTile)
-                    checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+                var nextTile = getNextTile(currentTile, Qt.point(-2, 2*srcPiece.direction))
+                if(nextTile != prevTile){
+                    if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                        currentTile.directionToCapture = Qt.point(-2, 2*srcPiece.direction)
+                        return true
+                    }
+                    else
+                        return false
+                    }
             }
             if(srcPiece.isKing){
                 if(!crossesTheBoard(currentTile, Qt.point(2, -2*srcPiece.direction))){
-                    var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
-                    if(nextTile != prevTile)
-                        checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+                    var nextTile = getNextTile(currentTile, Qt.point(2, -2*srcPiece.direction))
+                    if(nextTile != prevTile){
+                        if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                            currentTile.directionToCapture = Qt.point(2, -2*srcPiece.direction)
+                            return true
+                        }
+                        else
+                            return false
+                        }
                 }
                 if(!crossesTheBoard(currentTile, Qt.point(-2, -2*srcPiece.direction))){
-                    var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
-                    if(nextTile != prevTile)
-                        checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
+                    var nextTile = getNextTile(currentTile, Qt.point(-2, -2*srcPiece.direction))
+                    if(nextTile != prevTile){
+                        if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                            currentTile.directionToCapture = Qt.point(-2, -2*srcPiece.direction)
+                            return true
+                        }
+                        else
+                            return false
+                    }
                 }
             }
-
-            validTiles.push(currentTile)
         }
     }
 
