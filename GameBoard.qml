@@ -62,30 +62,30 @@ Item {
         if(srcTile == currentTile || currentTile.piece != null)
             return
         if(capturesEnemy(prevTile, currentTile, srcPiece)){
+            validTiles.push(currentTile)
+
             if(!crossesTheBoard(currentTile, Qt.point(2, 2*srcPiece.direction))){
                 var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
                 if(nextTile != prevTile)
                     checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
             }
             if(!crossesTheBoard(currentTile, Qt.point(-2, 2*srcPiece.direction))){
-                var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                var nextTile = getNextTile(currentTile, Qt.point(-2, 2*srcPiece.direction))
                 if(nextTile != prevTile)
                     checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
             }
             if(srcPiece.isKing){
                 if(!crossesTheBoard(currentTile, Qt.point(2, -2*srcPiece.direction))){
-                    var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                    var nextTile = getNextTile(currentTile, Qt.point(2, -2*srcPiece.direction))
                     if(nextTile != prevTile)
                         checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
                 }
                 if(!crossesTheBoard(currentTile, Qt.point(-2, -2*srcPiece.direction))){
-                    var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
+                    var nextTile = getNextTile(currentTile, Qt.point(-2, -2*srcPiece.direction))
                     if(nextTile != prevTile)
                         checkPossibleCaptures(srcTile, nextTile, currentTile, srcPiece, validTiles)
                 }
             }
-
-            validTiles.push(currentTile)
         }
     }
 
