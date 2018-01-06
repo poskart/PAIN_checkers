@@ -38,40 +38,32 @@ Item {
 
         if(!crossesTheBoard(srcTile, Qt.point(2, 2*srcPiece.direction))){
             var nextTile = getNextTile(srcTile, Qt.point(2, 2*srcPiece.direction))
-            if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+            if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
+                    clickedDestTile != null){
                 srcTile.directionToCapture = Qt.point(2, 2*srcPiece.direction)
-                return true
             }
-            else
-                return false
         }
         if(!crossesTheBoard(srcTile, Qt.point(-2, 2*srcPiece.direction))){
             var nextTile = getNextTile(srcTile, Qt.point(-2, 2*srcPiece.direction))
-            if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+            if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
+                    clickedDestTile != null){
                 srcTile.directionToCapture = Qt.point(-2, 2*srcPiece.direction)
-                return true
             }
-            else
-                return false
         }
         if(srcPiece.isKing){
             if(!crossesTheBoard(srcTile, Qt.point(2, -2*srcPiece.direction))){
                 var nextTile = getNextTile(srcTile, Qt.point(2, -2*srcPiece.direction))
-                if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+                if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
+                        clickedDestTile != null){
                     srcTile.directionToCapture = Qt.point(2, -2*srcPiece.direction)
-                    return true
                 }
-                else
-                    return false
             }
             if(!crossesTheBoard(srcTile, Qt.point(-2, -2*srcPiece.direction))){
                 var nextTile = getNextTile(srcTile, Qt.point(-2, -2*srcPiece.direction))
-                if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles)){
+                if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
+                        clickedDestTile != null){
                     srcTile.directionToCapture = Qt.point(-2, -2*srcPiece.direction)
-                    return true
                 }
-                else
-                    return false
             }
         }
 
@@ -88,46 +80,50 @@ Item {
             if(!crossesTheBoard(currentTile, Qt.point(2, 2*srcPiece.direction))){
                 var nextTile = getNextTile(currentTile, Qt.point(2, 2*srcPiece.direction))
                 if(nextTile != prevTile){
-                    if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                    if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
+                            clickedDestTile != null){
                         currentTile.directionToCapture = Qt.point(2, 2*srcPiece.direction)
                         return true
                     }
-                    else
-                        return false
+//                    else
+//                        return false
                 }
             }
             if(!crossesTheBoard(currentTile, Qt.point(-2, 2*srcPiece.direction))){
                 var nextTile = getNextTile(currentTile, Qt.point(-2, 2*srcPiece.direction))
                 if(nextTile != prevTile){
-                    if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                    if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
+                            clickedDestTile != null){
                         currentTile.directionToCapture = Qt.point(-2, 2*srcPiece.direction)
                         return true
                     }
-                    else
-                        return false
+//                    else
+//                        return false
                     }
             }
             if(srcPiece.isKing){
                 if(!crossesTheBoard(currentTile, Qt.point(2, -2*srcPiece.direction))){
                     var nextTile = getNextTile(currentTile, Qt.point(2, -2*srcPiece.direction))
                     if(nextTile != prevTile){
-                        if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                        if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
+                                clickedDestTile != null){
                             currentTile.directionToCapture = Qt.point(2, -2*srcPiece.direction)
                             return true
                         }
-                        else
-                            return false
+//                        else
+//                            return false
                         }
                 }
                 if(!crossesTheBoard(currentTile, Qt.point(-2, -2*srcPiece.direction))){
                     var nextTile = getNextTile(currentTile, Qt.point(-2, -2*srcPiece.direction))
                     if(nextTile != prevTile){
-                        if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles)){
+                        if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
+                                clickedDestTile != null){
                             currentTile.directionToCapture = Qt.point(-2, -2*srcPiece.direction)
                             return true
                         }
-                        else
-                            return false
+//                        else
+//                            return false
                     }
                 }
             }
@@ -218,7 +214,7 @@ Item {
                                 clickedTileWithPiece = tile
                                 clickedPiece = tile.piece
                                 tile.piece.lightenPiece()
-                                lightenedTiles = getPossibleCaptures(tile, clickedPiece)
+                                lightenedTiles = getPossibleCaptures(tile, clickedPiece, null)
                                 for(var i = 0; i < lightenedTiles.length; ++i){
                                     lightenedTiles[i].lightenPiece()
                                 }
