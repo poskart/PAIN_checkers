@@ -11,6 +11,7 @@ Item {
     property int whiteDirection: 1
     property int blackDirection: -1
     property var lightenedTiles
+    property var tilesWithDirection
 
     states: [
         State {
@@ -24,13 +25,37 @@ Item {
     function handleMove(targetTile){
         if(targetTile.row % 2 == targetTile.col % 2 &&
                 goodDirectionChoosen(clickedPiece, targetTile)){
-            clickedPiece.parent = targetTile
-            targetTile.piece = clickedPiece
-            clickedTileWithPiece.piece = null
-            nextTurn()
+            if(diagonalNeighbour(clickedTileWithPiece, targetTile)){
+                clickedPiece.parent = targetTile
+                targetTile.piece = clickedPiece
+                clickedTileWithPiece.piece = null
+                nextTurn()
+            }
+            else{
+                getPossibleCaptures(clickedTileWithPiece, clickedPiece, targetTile)
+                if(clickedTileWithPiece.directionToCapture != null){
+                    captureEnemyUsingSavedPath(clickedTileWithPiece, clickedPiece)
+                    clickedPiece = null
+                    clickedTileWithPiece = null
+                    nextTurn()
+                }
+            }
         }
         clickedPiece = null
         clickedTileWithPiece = null
+    }
+
+    function diagonalNeighbour(tile1, tile2){
+        var rowDiff = Math.abs(tile1.row - tile2.row)
+        var colDiff = Math.abs(tile1.col - tile2.col)
+        if(rowDiff == 1 && colDiff == 1)
+            return true
+        return false
+    }
+
+    function addDirectionToTile(tile, direction){
+        tile.directionToCapture = direction;
+        tilesWithDirection.push(tile)
     }
 
     function getPossibleCaptures(srcTile, srcPiece, clickedDestTile){
@@ -40,14 +65,14 @@ Item {
             var nextTile = getNextTile(srcTile, Qt.point(2, 2*srcPiece.direction))
             if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
                     clickedDestTile != null){
-                srcTile.directionToCapture = Qt.point(2, 2*srcPiece.direction)
+                addDirectionToTile(srcTile, Qt.point(2, 2*srcPiece.direction))
             }
         }
         if(!crossesTheBoard(srcTile, Qt.point(-2, 2*srcPiece.direction))){
             var nextTile = getNextTile(srcTile, Qt.point(-2, 2*srcPiece.direction))
             if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
                     clickedDestTile != null){
-                srcTile.directionToCapture = Qt.point(-2, 2*srcPiece.direction)
+                addDirectionToTile(srcTile, Qt.point(-2, 2*srcPiece.direction))
             }
         }
         if(srcPiece.isKing){
@@ -55,14 +80,14 @@ Item {
                 var nextTile = getNextTile(srcTile, Qt.point(2, -2*srcPiece.direction))
                 if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
                         clickedDestTile != null){
-                    srcTile.directionToCapture = Qt.point(2, -2*srcPiece.direction)
+                    addDirectionToTile(srcTile, Qt.point(2, -2*srcPiece.direction))
                 }
             }
             if(!crossesTheBoard(srcTile, Qt.point(-2, -2*srcPiece.direction))){
                 var nextTile = getNextTile(srcTile, Qt.point(-2, -2*srcPiece.direction))
                 if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, srcTile, srcPiece, validTiles) &&
                         clickedDestTile != null){
-                    srcTile.directionToCapture = Qt.point(-2, -2*srcPiece.direction)
+                    addDirectionToTile(srcTile, Qt.point(-2, -2*srcPiece.direction))
                 }
             }
         }
@@ -82,11 +107,9 @@ Item {
                 if(nextTile != prevTile){
                     if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
                             clickedDestTile != null){
-                        currentTile.directionToCapture = Qt.point(2, 2*srcPiece.direction)
+                        addDirectionToTile(currentTile, Qt.point(2, 2*srcPiece.direction))
                         return true
                     }
-//                    else
-//                        return false
                 }
             }
             if(!crossesTheBoard(currentTile, Qt.point(-2, 2*srcPiece.direction))){
@@ -94,12 +117,10 @@ Item {
                 if(nextTile != prevTile){
                     if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
                             clickedDestTile != null){
-                        currentTile.directionToCapture = Qt.point(-2, 2*srcPiece.direction)
+                        addDirectionToTile(currentTile, Qt.point(-2, 2*srcPiece.direction))
                         return true
                     }
-//                    else
-//                        return false
-                    }
+                }
             }
             if(srcPiece.isKing){
                 if(!crossesTheBoard(currentTile, Qt.point(2, -2*srcPiece.direction))){
@@ -107,27 +128,51 @@ Item {
                     if(nextTile != prevTile){
                         if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
                                 clickedDestTile != null){
-                            currentTile.directionToCapture = Qt.point(2, -2*srcPiece.direction)
+                            addDirectionToTile(currentTile, Qt.point(2, -2*srcPiece.direction))
                             return true
                         }
-//                        else
-//                            return false
-                        }
+                    }
                 }
                 if(!crossesTheBoard(currentTile, Qt.point(-2, -2*srcPiece.direction))){
                     var nextTile = getNextTile(currentTile, Qt.point(-2, -2*srcPiece.direction))
                     if(nextTile != prevTile){
                         if(checkPossibleCaptures(srcTile, clickedDestTile, nextTile, currentTile, srcPiece, validTiles) &&
                                 clickedDestTile != null){
-                            currentTile.directionToCapture = Qt.point(-2, -2*srcPiece.direction)
+                            addDirectionToTile(currentTile, Qt.point(-2, -2*srcPiece.direction))
                             return true
                         }
-//                        else
-//                            return false
                     }
                 }
             }
         }
+    }
+
+    function captureEnemyUsingSavedPath(srcTile, srcPiece){
+        var currTile = srcTile
+        var nextTile
+        var tileToCapture
+        while(currTile.directionToCapture != null){
+            nextTile = getNextTile(currTile, currTile.directionToCapture)
+            tileToCapture = getTileBetween(currTile, nextTile)
+            if(tileToCapture.piece != null)
+                tileToCapture.piece.destroy()
+            tileToCapture.piece = null
+            currTile.directionToCapture = null
+            nextTile.piece = currTile.piece
+            nextTile.piece.parent = nextTile
+            currTile.piece = null
+            currTile = nextTile
+        }
+        for(var i = 0; i < tilesWithDirection.length; ++i){
+            tilesWithDirection[i].directionToCapture = null
+        }
+    }
+
+    function getTileBetween(tile1, tile2){
+        var rowBetween = (tile1.row + tile2.row)/2
+        var colBetween = (tile1.col + tile2.col)/2
+        var index = rowBetween*grid.columns+colBetween
+        return tilesRepeater.itemAt(index)
     }
 
     function getNextTile(srcTile, moveOffset){
@@ -148,10 +193,10 @@ Item {
     }
 
     function capturesEnemy(srcTile, targetTile, srcPiece){
-        var newColumn = (srcTile.col + targetTile.col)/2
-        var newRow = (srcTile.row + targetTile.row)/2
-        var index = newRow*grid.columns+newColumn
-        var tileBetween = tilesRepeater.itemAt(index)
+//        var newColumn = (srcTile.col + targetTile.col)/2
+//        var newRow = (srcTile.row + targetTile.row)/2
+//        var index = newRow*grid.columns+newColumn
+        var tileBetween = getTileBetween(srcTile, targetTile)//tilesRepeater.itemAt(index)
         if(tileBetween.piece != null && tileBetween.piece.team != srcPiece.team)
             return true
         return false
@@ -185,6 +230,18 @@ Item {
         }
     }
 
+    function lightenTiles(tiles){
+        for(var i = 0; i < tiles.length; ++i){
+            tiles[i].lightenTile()
+        }
+    }
+
+    function darkenTiles(tiles){
+        for(var i = 0; i < tiles.length; ++i){
+            tiles[i].darkenTile()
+        }
+    }
+
     Grid{
         id: grid
         rows: 8
@@ -203,9 +260,7 @@ Item {
                         if(clickedPiece != null)
                             clickedPiece.darkenPiece()
                         if(lightenedTiles != null){
-                            for(var i = 0; i < lightenedTiles.length; ++i){
-                                lightenedTiles[i].darkenPiece()
-                            }
+                            darkenTiles(lightenedTiles)
                             lightenedTiles = null
                         }
 
@@ -215,9 +270,7 @@ Item {
                                 clickedPiece = tile.piece
                                 tile.piece.lightenPiece()
                                 lightenedTiles = getPossibleCaptures(tile, clickedPiece, null)
-                                for(var i = 0; i < lightenedTiles.length; ++i){
-                                    lightenedTiles[i].lightenPiece()
-                                }
+                                lightenTiles(lightenedTiles)
 
                                 console.log("Clicked on piece")
                             }
@@ -254,5 +307,9 @@ Item {
                 }
             }
         }
+    }
+
+    Component.onCompleted: {
+        tilesWithDirection = new Array()
     }
 }

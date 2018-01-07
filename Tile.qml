@@ -12,11 +12,11 @@ Rectangle {
     height: width
     color: (row + col) % 2 ? "white" : "#443311"
 
-    function lightenPiece(){
+    function lightenTile(){
         transitionColor = tile.color
         color = Qt.lighter(transitionColor, 1.9)
     }
-    function darkenPiece(){
+    function darkenTile(){
         tile.color = transitionColor
     }
 }
