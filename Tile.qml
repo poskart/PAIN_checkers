@@ -6,7 +6,7 @@ Rectangle {
     property int col;
     property Piece piece;
     property color transitionColor
-    property var directionToCapture
+    property var directionToCapture: null
 
     width: 100
     height: width
