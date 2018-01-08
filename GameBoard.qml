@@ -11,6 +11,9 @@ Item {
     property int whiteDirection: 1
     property int blackDirection: -1
     property var lightenedTiles
+    property int blackPiecesCount: 12
+    property int whitePiecesCount: 12
+    property alias gameOverText: gameOverTextBox
 
     states: [
         State {
@@ -54,6 +57,17 @@ Item {
 
     function addDirectionToTile(tile, direction){
         tile.directionToCapture = direction;
+    }
+
+    function decreasePiecesCount(srcPiece){
+        if(srcPiece.team == "white"){
+            whitePiecesCount--;
+            console.log("wywalono białego, jest ich: ", whitePiecesCount)
+        }
+        else if(srcPiece.team == "black"){
+            blackPiecesCount--;
+            console.log("wywalono czarnego, jest ich: ", blackPiecesCount)
+        }
     }
 
     function getPossibleCaptures(srcTile, srcPiece, clickedDestTile){
@@ -156,8 +170,10 @@ Item {
         while(currTile.directionToCapture != null){
             nextTile = getNextTile(currTile, currTile.directionToCapture)
             tileToCapture = getTileBetween(currTile, nextTile)
-            if(tileToCapture.piece != null)
+            if(tileToCapture.piece != null){
                 tileToCapture.piece.destroy()
+                decreasePiecesCount(tileToCapture.piece)
+            }
             tileToCapture.piece = null
             currTile.directionToCapture = null
             nextTile.piece = currTile.piece
@@ -214,6 +230,8 @@ Item {
     }
 
     function goodDirectionChoosen(piece, targetTile){
+        if(piece.isKing == true)
+            return true
         if(piece.team === "white"){
             if(piece.parent.row * whiteDirection < targetTile.row * whiteDirection){
                 return true
@@ -224,6 +242,7 @@ Item {
                 return true
             }
         }
+        return false;
     }
 
     function checkChangeToKing(srcTile){
@@ -336,6 +355,31 @@ Item {
                     }
                 }
             }
+        }
+    }
+    Rectangle{
+        id: gameOverScreen
+        anchors.fill: parent
+        opacity: 0
+        color: "#AAAAFF"
+        Text{
+            id: gameOverTextBox
+            text: ""
+            font.pointSize: 44
+            color: "black"
+            anchors.centerIn: parent
+        }
+    }
+    onWhitePiecesCountChanged: {
+        if(whitePiecesCount == 0){
+            gameOverText.text = "RED IS THE WINNER!"
+            gameOverScreen.opacity = 1
+        }
+    }
+    onBlackPiecesCountChanged: {
+        if(blackPiecesCount == 0){
+            gameOverText.text = "WHITE IS THE WINNER!"
+            gameOverScreen.opacity = 1
         }
     }
 }
