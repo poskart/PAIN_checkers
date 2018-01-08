@@ -6,16 +6,17 @@ Rectangle {
     property int col;
     property Piece piece;
     property color transitionColor
+    property var directionToCapture: null
 
     width: 100
     height: width
     color: (row + col) % 2 ? "white" : "#443311"
 
-    function lightenPiece(){
+    function lightenTile(){
         transitionColor = tile.color
         color = Qt.lighter(transitionColor, 1.9)
     }
-    function darkenPiece(){
+    function darkenTile(){
         tile.color = transitionColor
     }
 }
