@@ -5,6 +5,8 @@ Item {
     width: 800
     height: width
     state: "whiteTurn"
+    anchors.centerIn: parent
+    scale: Math.min(parent.width/width, parent.height/height)
 
     property Piece clickedPiece;
     property Tile clickedTileWithPiece;
@@ -103,7 +105,6 @@ Item {
                 }
             }
         }
-
         return validTiles
     }
 
@@ -316,8 +317,6 @@ Item {
                                 lightenedTiles = getPossibleCaptures(tile, clickedPiece, null)
                                 addHighlightOfTheDiagonalNeighbours(tile, lightenedTiles)
                                 lightenTiles(lightenedTiles)
-
-                                console.log("Clicked on piece")
                             }
                         }
                         else{
